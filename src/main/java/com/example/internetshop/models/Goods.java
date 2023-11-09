@@ -11,10 +11,14 @@ public class Goods {
     private String goodName;
     private int price;
     @OneToMany (mappedBy = "goods")
-    @JoinColumn
     @JsonIgnore
     private List<OrderPosition> orderPositions;
-
+    public List<OrderPosition> getOrderPositions() {
+        return orderPositions;
+    }
+    public void setOrderPositions(List<OrderPosition> orderPositions) {
+        this.orderPositions = orderPositions;
+    }
     public int getGoodID() {
         return goodID;
     }
