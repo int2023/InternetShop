@@ -10,11 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping
+@RequestMapping("/goods")
 public class GoodsController {
-
     GoodsRepository goodsRepository;
-
     public GoodsController(GoodsRepository goodsRepository) {
         this.goodsRepository = goodsRepository;
     }
@@ -32,16 +30,16 @@ public class GoodsController {
 
     @GetMapping
     public ResponseEntity<?> getAllGoods () {
-        List<Goods> listOfProducts = new ArrayList<>();
+        List<Goods> listOfGoods = new ArrayList<>();
         for (Goods product : goodsRepository.findAll()) {
-            listOfProducts.add(product);
+            listOfGoods.add(product);
         }
-        return new ResponseEntity<>(listOfProducts,HttpStatus.OK);
+        return new ResponseEntity<>(listOfGoods,HttpStatus.OK);
     }
 
     @GetMapping ("/{id}")
     public ResponseEntity<?> getProductByID (@PathVariable int goodID) {
-        if (! goodsRepository.findById(goodID).isPresent()) {
+        if (goodsRepository.findById(goodID).isEmpty()) {
             return new ResponseEntity<>
                     ("This product is abcent",HttpStatus.NOT_FOUND);
         }
@@ -49,9 +47,9 @@ public class GoodsController {
         return new ResponseEntity<>(requestedProduct,HttpStatus.OK);
     }
 
-    @DeleteMapping ("/{id}")
+    @DeleteMapping ("/{goodID}")
     public ResponseEntity<?> deleteGoods (@PathVariable int goodID) {
-        if (! goodsRepository.findById(goodID).isPresent()) {
+        if (goodsRepository.findById(goodID).isEmpty()) {
             return new ResponseEntity<>
                     ("This product is abcent",HttpStatus.BAD_REQUEST);
         }
