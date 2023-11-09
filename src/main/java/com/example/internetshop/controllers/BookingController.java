@@ -12,20 +12,17 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
-
     BookingsRepository bookingsRepository;
-
     public BookingController(BookingsRepository bookingsRepository) {
         this.bookingsRepository = bookingsRepository;
     }
-
     @PostMapping
     public ResponseEntity<?> addBooking (@RequestBody Booking booking) {
         int bookingNumber = booking.getNumber();
         Optional<Booking> number = bookingsRepository.findById(bookingNumber);
         if (number.isPresent()) {
             return new ResponseEntity<>
-                    ("Product is already exist", HttpStatus.BAD_REQUEST);
+                    ("Booking is already exist", HttpStatus.BAD_REQUEST);
         }
         bookingsRepository.save(booking);
         return new ResponseEntity<>(booking, HttpStatus.OK);
