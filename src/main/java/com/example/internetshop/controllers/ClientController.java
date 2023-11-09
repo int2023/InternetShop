@@ -41,8 +41,8 @@ public class ClientController {
         return new ResponseEntity<>(clients,HttpStatus.OK);
     }
 
-    @GetMapping("/{inn}")
-    public ResponseEntity<?> getClientByINN (int clientINN) {
+    @GetMapping("/{clientINN}")
+    public ResponseEntity<?> getClientByINN (@PathVariable int clientINN) {
         if (clientRepository.findById(clientINN).isEmpty()) {
             return new ResponseEntity<>
             ("Client with such INN doesn't exist",HttpStatus.NOT_FOUND);
@@ -51,8 +51,8 @@ public class ClientController {
         return new ResponseEntity<>(requestedClient,HttpStatus.OK);
     }
 
-    @DeleteMapping("/{inn}")
-    public ResponseEntity<?> deleteClientByINN (int clientINN) {
+    @DeleteMapping("/{clientINN}")
+    public ResponseEntity<?> deleteClientByINN (@PathVariable int clientINN) {
         if (clientRepository.findById(clientINN).isEmpty()) {
             return new ResponseEntity<>
             ("Client with such INN doesn't exist",HttpStatus.NOT_FOUND);
