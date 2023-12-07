@@ -11,10 +11,8 @@ public class Booking {
     private LocalDate bookingDate;
     @ManyToOne
     @JoinColumn (name = "clientINN")
-    @JsonIgnore
     private Client client;
     @OneToMany (mappedBy = "booking")
-    @JsonIgnore
     private List<OrderPosition> positions;
 
     public Client getClient() {
