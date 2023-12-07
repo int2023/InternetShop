@@ -15,6 +15,8 @@ public class Client {
     private LocalDate birthDate;
     private LocalDate regDate;
 
+    private List<Basket> baskets;
+
     @OneToMany(mappedBy = "client")
     private List<Booking> bookings;
 
@@ -53,5 +55,11 @@ public class Client {
     }
     public void setRegDate(LocalDate regDate) {
         this.regDate = regDate;
+    }
+    public List<Basket> getBaskets() {
+        return baskets;
+    }
+    public void setBaskets(List<Basket> baskets) {
+        this.baskets = baskets;
     }
 }
