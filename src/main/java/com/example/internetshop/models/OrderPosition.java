@@ -9,11 +9,9 @@ public class OrderPosition {
     private int goodsQuantity;
     @ManyToOne
     @JoinColumn (name = "goodsId")
-    @JsonIgnore
     private Goods goods;
     @ManyToOne
     @JoinColumn(name = "bookingId")
-    @JsonIgnore
     private Booking booking;
 
     public int getId() {
