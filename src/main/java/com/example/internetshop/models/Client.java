@@ -15,6 +15,7 @@ public class Client {
     private LocalDate birthDate;
     private LocalDate regDate;
 
+    @OneToMany (mappedBy = "client")
     private List<Basket> baskets;
 
     @OneToMany(mappedBy = "client")
