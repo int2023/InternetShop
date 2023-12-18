@@ -1,7 +1,10 @@
 package com.example.internetshop.controllers;
 import com.example.internetshop.models.Booking;
+import com.example.internetshop.models.Client;
 import com.example.internetshop.models.Goods;
 import com.example.internetshop.models.OrderPosition;
+import com.example.internetshop.repositories.BookingsRepository;
+import com.example.internetshop.repositories.ClientRepository;
 import com.example.internetshop.repositories.GoodsRepository;
 import com.example.internetshop.repositories.OrderPositionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,10 @@ public class OrderPosController {
     OrderPositionsRepository orderPositionsRepository;
     @Autowired
     GoodsRepository goodsRepository;
+    @Autowired
+    ClientRepository clientRepository;
+    @Autowired
+    BookingsRepository bookingsRepository;
 
     public OrderPosController(OrderPositionsRepository orderPositionsRepository) {
         this.orderPositionsRepository = orderPositionsRepository;
@@ -107,4 +114,5 @@ public class OrderPosController {
         }
         return new ResponseEntity<>(goodsList,HttpStatus.OK);
     }
+
 }
