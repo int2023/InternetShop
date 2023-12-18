@@ -1,11 +1,18 @@
 package com.example.internetshop.controllers;
+import com.example.internetshop.controllers.servicesDTO.BookingsOfClientDTO;
+import com.example.internetshop.controllers.servicesDTO.ClientsDTO;
+import com.example.internetshop.controllers.servicesDTO.OrderPositionDTO;
+import com.example.internetshop.models.Basket;
 import com.example.internetshop.models.Booking;
 import com.example.internetshop.models.Client;
-import com.example.internetshop.repositories.ClientRepository;
+import com.example.internetshop.models.OrderPosition;
+import com.example.internetshop.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,12 +20,20 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
-
     ClientRepository clientRepository;
+    public ClientController(ClientRepository clientRepository)
+    { this.clientRepository = clientRepository;}
 
-    public ClientController(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
-    }
+    @Autowired
+    BookingsRepository bookingsRepository;
+
+    @Autowired
+    OrderPositionsRepository orderPositionsRepository;
+
+    @Autowired
+    GoodsRepository goodsRepository;
+    @Autowired
+    BasketRepository basketRepository;
 
     @PostMapping
     public ResponseEntity<?> addClient (@RequestBody Client client) {
@@ -33,10 +48,17 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllClients () {
-        List<Client> clients = new ArrayList<>();
+    public ResponseEntity<?> getAllClientsDTO () {
+        List<ClientsDTO> clients = new ArrayList<>();
+
         for (Client client : clientRepository.findAll()) {
-            clients.add(client);
+            ClientsDTO clientDTO = new ClientsDTO();
+            clientDTO.setClientINN(clientDTO.getClientINN());
+            clientDTO.setName(client.getName());
+            clientDTO.setFamilyName(client.getFamilyName());
+            clientDTO.setBirthDate(client.getBirthDate());
+            clientDTO.setRegDate(client.getRegDate());
+            clients.add(clientDTO);
         }
         return new ResponseEntity<>(clients,HttpStatus.OK);
     }
@@ -54,6 +76,7 @@ public class ClientController {
     @DeleteMapping("/{clientINN}")
     public ResponseEntity<?> deleteClientByINN (@PathVariable int clientINN) {
         if (clientRepository.findById(clientINN).isEmpty()) {
+
             return new ResponseEntity<>
             ("Client with such INN doesn't exist",HttpStatus.NOT_FOUND);
         }
@@ -61,4 +84,69 @@ public class ClientController {
         return new ResponseEntity<>("Deleted successfully",HttpStatus.OK);
     }
 
+    @GetMapping ("/{clientINN}/bookings")
+    public ResponseEntity<?> getBookingsByClientDTO (@PathVariable int clientINN) {
+        List <BookingsOfClientDTO> result = new ArrayList<>();
+        int totalSumOfAllPositions = 0;
+
+        if (clientRepository.findById(clientINN).isEmpty()) {
+            return new ResponseEntity<>
+             ("Client with such INN doesn't exist",HttpStatus.BAD_REQUEST);
+        }
+
+        List<Booking> bookingslist = clientRepository.findById(clientINN).
+                get().getBookings();
+
+        for (Booking book : bookingslist) {
+            BookingsOfClientDTO bookingsOfClientDTO = new BookingsOfClientDTO();
+            bookingsOfClientDTO.setClientINN(clientINN);
+            bookingsOfClientDTO.setBookingDate(book.getBookingDate());
+
+            List <OrderPositionDTO> list = new ArrayList<>();
+            totalSumOfAllPositions = 0;
+            for (OrderPosition o : book.getPositions()) {
+                OrderPositionDTO orderPositionDTO = new OrderPositionDTO();
+                orderPositionDTO.setPositionName(o.getGoods().getGoodName());
+                orderPositionDTO.setGoodsQuantity(o.getGoodsQuantity());
+                orderPositionDTO.setPriceForUnit(o.getGoods().getPrice());
+                orderPositionDTO.setSumPriceOfPosition
+                         (o.getGoods().getPrice() * o.getGoodsQuantity());
+                list.add(orderPositionDTO);
+                totalSumOfAllPositions += orderPositionDTO.getSumPriceOfPosition();
+            }
+            bookingsOfClientDTO.setPositionsList(list);
+            bookingsOfClientDTO.setBookingTotalPrice(totalSumOfAllPositions);
+            result.add(bookingsOfClientDTO);
+       }
+       return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    @PostMapping("/{clientID}/")
+    public ResponseEntity<?> transformBasketInOrder (@PathVariable int clientID) {
+        Client client = clientRepository.findById(clientID).get();
+        List <Basket> baskets = client.getBaskets();
+        Booking booking = new Booking();
+        booking.setClient(client);
+        booking.setBookingDate(LocalDateTime.now().toLocalDate());
+        bookingsRepository.save(booking);
+
+        for (Basket basket : baskets) {
+            OrderPosition orderPosition = new OrderPosition();
+            orderPosition.setGoods(basket.getGood());
+            orderPosition.setId(basket.getGood().getGoodID());
+            orderPosition.setGoodsQuantity(basket.getGoodQuantity());
+            orderPosition.setBooking(booking);
+            orderPositionsRepository.save(orderPosition);
+        }
+        return new ResponseEntity<>("Order confirmed",HttpStatus.OK);
+
+    }
+
+
+
+
 }
+
+
+
+
