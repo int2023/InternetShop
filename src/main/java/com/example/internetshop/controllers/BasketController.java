@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,13 +65,17 @@ public class BasketController {
         ("Basket is successfully deleted", HttpStatus.OK);
     }
 
-    @GetMapping ("/{clientID}")
+    @GetMapping ("")
     public ResponseEntity<?> getAllBasketsByClientID (@RequestParam int clientID) {
 
+        if (!clientRepository.findById(clientID).isPresent()) {
+            return new ResponseEntity<>
+                    ("Such client is not registered",HttpStatus.NOT_FOUND);
+        }
         Client client = clientRepository.findById(clientID).get();
         if (client.getBaskets().size() == 0) {
             return new ResponseEntity<>
-                    ("Such client doesn't have any baskets",HttpStatus.NOT_FOUND);
+            ("Such client doesn't have any baskets",HttpStatus.NOT_FOUND);
         }
         List<Basket> basketList = client.getBaskets();
         return new ResponseEntity<>(basketList,HttpStatus.OK);
