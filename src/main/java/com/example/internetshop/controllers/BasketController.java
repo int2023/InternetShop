@@ -1,4 +1,5 @@
 package com.example.internetshop.controllers;
+import com.example.internetshop.controllers.servicesDTO.BasketDTO;
 import com.example.internetshop.models.Basket;
 import com.example.internetshop.models.Client;
 import com.example.internetshop.models.Goods;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/baskets")
@@ -47,7 +49,11 @@ public class BasketController {
         Basket basketFromDB = basketRepository.findById(basketID).get();
         basketFromDB.setGoodQuantity(basketFromDB.getGoodQuantity() + 1);
         basketRepository.save(basketFromDB);
-        return new ResponseEntity<>(basketFromDB, HttpStatus.OK);
+        BasketDTO basketDTO = new BasketDTO(basketFromDB.getBasketID(),
+                basketFromDB.getGoodQuantity(),basketFromDB.getClient().getClientINN(),
+                basketFromDB.getGood().getGoodID(),basketFromDB.getGood().getPrice(),
+                basketFromDB.getGood().getGoodName());
+        return new ResponseEntity<>(basketDTO, HttpStatus.OK);
     }
 
     @PostMapping("/{basketID}/dec")
@@ -55,7 +61,11 @@ public class BasketController {
         Basket basketFromDB = basketRepository.findById(basketID).get();
         basketFromDB.setGoodQuantity(basketFromDB.getGoodQuantity() - 1);
         basketRepository.save(basketFromDB);
-        return new ResponseEntity<>(basketFromDB, HttpStatus.OK);
+        BasketDTO basketDTO = new BasketDTO(basketFromDB.getBasketID(),
+                basketFromDB.getGoodQuantity(),basketFromDB.getClient().getClientINN(),
+                basketFromDB.getGood().getGoodID(),basketFromDB.getGood().getPrice(),
+                basketFromDB.getGood().getGoodName());
+        return new ResponseEntity<>(basketDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{basketID}")
@@ -78,13 +88,14 @@ public class BasketController {
             ("Such client doesn't have any baskets",HttpStatus.NOT_FOUND);
         }
         List<Basket> basketList = client.getBaskets();
-        return new ResponseEntity<>(basketList,HttpStatus.OK);
+        List<BasketDTO> basketDTOList = basketList.stream().map
+                (b -> new BasketDTO(b.getBasketID(), b.getGoodQuantity(),
+                client.getClientINN(), b.getGood().getGoodID(), b.getGood().getPrice(),
+                b.getGood().getGoodName())).collect(Collectors.toList());
+
+        return new ResponseEntity<>(basketDTOList,HttpStatus.OK);
     }
 
-
-    //1) get List <Basket> @RequestParam using clientID; in this class
-    //2) confirm order -> transform Basket into OrderPosition; in clientController
-    //create Booking and OrderPositions at every element of Basket and save it;
 
 }
 
