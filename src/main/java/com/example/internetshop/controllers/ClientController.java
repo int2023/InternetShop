@@ -53,7 +53,7 @@ public class ClientController {
 
         for (Client client : clientRepository.findAll()) {
             ClientsDTO clientDTO = new ClientsDTO();
-            clientDTO.setClientINN(clientDTO.getClientINN());
+            clientDTO.setClientINN(client.getClientINN());
             clientDTO.setName(client.getName());
             clientDTO.setFamilyName(client.getFamilyName());
             clientDTO.setBirthDate(client.getBirthDate());
@@ -121,7 +121,7 @@ public class ClientController {
        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
-    @PostMapping("/{clientID}/")
+    @PostMapping("/{clientID}/createOrder")
     public ResponseEntity<?> transformBasketInOrder (@PathVariable int clientID) {
         Client client = clientRepository.findById(clientID).get();
         List <Basket> baskets = client.getBaskets();
