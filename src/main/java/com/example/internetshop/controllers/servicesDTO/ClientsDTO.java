@@ -3,7 +3,6 @@ import jakarta.persistence.Id;
 import java.time.LocalDate;
 
 public class ClientsDTO {
-    @Id
     private int clientINN;
     private String FamilyName;
     private String name;
