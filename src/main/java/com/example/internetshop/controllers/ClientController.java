@@ -143,6 +143,22 @@ public class ClientController {
     }
 
 
+    @PostMapping("/bulk")
+    public ResponseEntity <?> createClients (@RequestBody List <Client> list) {
+        List <Client> successfullyCreated = new ArrayList<>();
+        for (Client client : list) {
+            Optional<Client> byINN = clientRepository.findById(client.getClientINN());
+            if (byINN.isEmpty()) {
+                clientRepository.save(client);
+                successfullyCreated.add(client);
+            }
+        }
+        return new ResponseEntity<>(successfullyCreated,HttpStatus.CREATED);
+    }
+
+
+
+
 
 
 }
