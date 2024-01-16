@@ -13,6 +13,21 @@ public class Goods {
     @OneToMany (mappedBy = "goods")
     @JsonIgnore
     private List<OrderPosition> orderPositions;
+
+    @ManyToOne
+    @JoinColumn (name = "categoryID")
+    private Category category;
+
+    public Goods() {}
+
+    public Goods(int goodID, String goodName, int price,
+                 List<OrderPosition> orderPositions) {
+        this.goodID = goodID;
+        this.goodName = goodName;
+        this.price = price;
+
+    }
+
     public List<OrderPosition> getOrderPositions() {
         return orderPositions;
     }
