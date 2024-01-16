@@ -1,5 +1,7 @@
 package com.example.internetshop.controllers;
+import com.example.internetshop.models.Category;
 import com.example.internetshop.models.Goods;
+import com.example.internetshop.repositories.CategoryRepository;
 import com.example.internetshop.repositories.GoodsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,10 @@ import java.util.Optional;
 @RequestMapping("/goods")
 public class GoodsController {
     GoodsRepository goodsRepository;
+
+    @Autowired
+    CategoryRepository category;
+
     public GoodsController(GoodsRepository goodsRepository) {
         this.goodsRepository = goodsRepository;
     }
@@ -22,7 +28,8 @@ public class GoodsController {
         int productId = product.getGoodID();
         Optional<Goods> byId = goodsRepository.findById(productId);
         if (byId.isPresent()) {
-            return new ResponseEntity<>("Product is already exist",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Product is already exist",
+                    HttpStatus.BAD_REQUEST);
         }
         goodsRepository.save(product);
         return new ResponseEntity<>(product, HttpStatus.OK);
@@ -51,11 +58,13 @@ public class GoodsController {
     public ResponseEntity<?> deleteGoods (@PathVariable int goodID) {
         if (goodsRepository.findById(goodID).isEmpty()) {
             return new ResponseEntity<>
-                    ("This product is abcent",HttpStatus.BAD_REQUEST);
+                    ("This product is absent",HttpStatus.BAD_REQUEST);
         }
         goodsRepository.delete(goodsRepository.findById(goodID).get());
         return new ResponseEntity<>("Successfully deleted",HttpStatus.OK);
     }
+
+
 
 
 
