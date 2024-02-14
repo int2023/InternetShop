@@ -18,6 +18,14 @@ public class Goods {
     @JoinColumn (name = "categoryID")
     private Category category;
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public Goods() {}
 
     public Goods(int goodID, String goodName, int price,

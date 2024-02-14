@@ -1,5 +1,4 @@
 package com.example.internetshop.controllers;
-import com.example.internetshop.models.Category;
 import com.example.internetshop.models.Goods;
 import com.example.internetshop.repositories.CategoryRepository;
 import com.example.internetshop.repositories.GoodsRepository;
@@ -17,7 +16,7 @@ public class GoodsController {
     GoodsRepository goodsRepository;
 
     @Autowired
-    CategoryRepository category;
+    CategoryRepository categoryRepository;
 
     public GoodsController(GoodsRepository goodsRepository) {
         this.goodsRepository = goodsRepository;
@@ -64,7 +63,18 @@ public class GoodsController {
         return new ResponseEntity<>("Successfully deleted",HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllGoodsInCategory (@RequestParam int categoryID) {
+        if (categoryRepository.findById(categoryID).isEmpty()) {
+            return new ResponseEntity<>("Category with such ID " +
+                    "is not registered", HttpStatus.NOT_FOUND);
+        }
+        List<Goods> goodsList = categoryRepository.findById(categoryID).
+                get().getGoodsList();
 
+        return new ResponseEntity<>(goodsList,HttpStatus.OK);
+
+    }
 
 
 
