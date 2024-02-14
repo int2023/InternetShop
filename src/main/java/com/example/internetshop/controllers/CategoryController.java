@@ -49,47 +49,27 @@ public class CategoryController {
     }
 
 
-    @PostMapping("/{categoryID}/{product}")
-    public ResponseEntity<?> addProductToCategory (@RequestBody Goods product,
+    @PostMapping("/{categoryID}/goods/{goodID}")
+    public ResponseEntity<?> addProductToCategory (@PathVariable int goodID,
                                                    @PathVariable int categoryID) {
-        if (categoryRepository.findById(categoryID).get().getCategoryID() != 0)
-            return new ResponseEntity<>("Category of this product " +
-                    "is already exist", HttpStatus.BAD_REQUEST);
-
         if (categoryRepository.findById(categoryID).isEmpty()) {
             return new ResponseEntity<>("Category with such ID " +
                     "is not registered", HttpStatus.NOT_FOUND);
         }
-        categoryRepository.findById(categoryID).get().getGoodsList().add(product);
+        if (goodsRepository.findById(goodID).isEmpty()) {
+            return new ResponseEntity<>("Product with such ID " +
+                    "is not registered", HttpStatus.NOT_FOUND);
+        }
+        Goods product = goodsRepository.findById(goodID).get();
+        Category category = categoryRepository.findById(categoryID).get();
+        product.setCategory(category);
+        goodsRepository.save(product);
+
         return new ResponseEntity<>("Product is successfully added " +
                 "in this category", HttpStatus.OK);
     }
 
-
-    @DeleteMapping("/{categoryID}/{product}")
-    public ResponseEntity<?> deleteProductFromCategory
-            (@RequestBody Goods product, @PathVariable int categoryID) {
-
-        if (categoryRepository.findById(categoryID).isEmpty()) {
-            return new ResponseEntity<>("Category with such ID " +
-                    "is not registered", HttpStatus.NOT_FOUND);
-        }
-        categoryRepository.findById(categoryID).get().getGoodsList().remove(product);
-        return new ResponseEntity<>("Product is successfully deleted " +
-                "from this category", HttpStatus.OK);
-    }
-
-    @GetMapping ("")
-    public ResponseEntity<?> getAllGoodsInCategory (@RequestParam int categoryID) {
-        if (categoryRepository.findById(categoryID).isEmpty()) {
-            return new ResponseEntity<>("Category with such ID " +
-                    "is not registered", HttpStatus.NOT_FOUND);
-        }
-        List<Goods> goodsList = categoryRepository.findById(categoryID).
-                get().getGoodsList();
-
-        return new ResponseEntity<>(goodsList,HttpStatus.OK);
-
-    }
-
 }
+
+
+
